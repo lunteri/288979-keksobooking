@@ -179,7 +179,7 @@ var inputDisabled = document.querySelectorAll('input');
 var marker = document.querySelector('.map__pin--main');
 map.classList.add('map--faded');
 var addressInput = document.querySelector('#address');
-var buttonPins = document.querySelectorAll('.map__pin');
+
 
 function disabledInput() {
   for (var i = 0; i < inputDisabled.length; i++) {
