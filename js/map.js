@@ -54,7 +54,7 @@ var checks = ['12:00', '13:00', '14:00'];
 function getRandomArray(array) {
   var copiedArray = array.slice();
   copiedArray.sort(randomCallback);
-  copiedArray.length = getRandom(0, copiedArray.length); 
+  copiedArray.length = getRandom(0, copiedArray.length);
   return copiedArray;
 }
 
@@ -158,7 +158,19 @@ function createCard(container) {
 
 function addCard(offer) {
   var cardOffer = createCard(offer);
+  var closeBtn =  cardOffer.querySelector('.popup__close');
+  closeBtn.addEventListener('click', function () {
+    cardOffer.remove();
+  });
+  document.addEventListener('keydown', onCloseEscape);
   map.appendChild(cardOffer);
+}
+function onCloseEscape(evt) {
+  if (evt.keyCode === 27) {
+    var card = document.querySelector('.map__card');
+    card.remove();
+  }
+  document.removeEventListener('keydown', onCloseEscape);
 }
 
 function randomCallback() {
@@ -209,24 +221,11 @@ function searchPin() {
 
 function setListenerToPin(pin, offer) {
   pin.addEventListener('click', function () {
-  var currentCard = document.querySelector('.map__card');
+    var currentCard = document.querySelector('.map__card');
     if (currentCard) {
-     currentCard.remove()
-}     
-      addCard(offer)
-     var popupClose =  document.querySelector('.popup__close');
-     var createdCard = document.querySelector('.map__card');
-     function onClickCloseButton() {
-         createdCard.remove();
-     }
-     
-     document.addEventListener('keydown', function(evt) {
-         if (evt.keyCode === 27) {
-             createdCard.remove();
-         }
-    })
-      popupClose.addEventListener('click', onClickCloseButton);
-      mainPin.removeEventListener('mouseup', onMainPinMouseMouseUp);
+      currentCard.remove()
+    }
+    addCard(offer)
   });
 }
 
