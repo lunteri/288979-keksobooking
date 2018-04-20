@@ -140,8 +140,8 @@ function createCard(container) {
   article.querySelector('.popup__description').textContent = container.offer.description;
   var photosBlock = article.querySelector('.popup__photos');
   photosBlock.innerHTML = '';
-  for (var i = 0; i < photos.length; i++) {
-    var photosImg = photos[i];
+  for (var j = 0; j < photos.length; j++) {
+    var photosImg = photos[j];
     var photosBlockImg = document.createElement('img');
     photosBlockImg.src = photosImg;
     photosBlockImg.width = '45';
@@ -158,7 +158,7 @@ function createCard(container) {
 
 function addCard(offer) {
   var cardOffer = createCard(offer);
-  var closeBtn =  cardOffer.querySelector('.popup__close');
+  var closeBtn = cardOffer.querySelector('.popup__close');
   closeBtn.addEventListener('click', function () {
     cardOffer.remove();
   });
@@ -184,16 +184,17 @@ var MAIN_PIN_Y = 570;
 var MAIN_PIN_X = 375;
 var markerPin = (MAIN_PIN_X - MAIN_PIN_WIDTH / 2) + ', ' + (MAIN_PIN_Y - MAIN_PIN_HEIGHT / 2);
 var form = document.querySelector('.ad-form');
-var formInputs = form.querySelectorAll('input');
+var formInputs = form.querySelectorAll('fieldset');
 var mainPin = document.querySelector('.map__pin--main');
 var addressInput = document.querySelector('#address');
 var buttonRelode = document.querySelector('.ad-form__reset');
 var addForm = document.querySelector('.ad-form');
-var selectPrice = document.querySelector('#price');
 var accommodationType = document.querySelector('select[name="type"]');
 var priceOfNight = document.querySelector('#price');
 var rooms = document.querySelector('select[name="rooms"]');
 var capacity = document.querySelector('select[name="capacity"]');
+var timein = document.querySelector('#timein');
+var timeout = document.querySelector('#timeout');
 
 
 function disableInputs() {
@@ -232,26 +233,26 @@ function setListenerToPin(pin, offer) {
   pin.addEventListener('click', function () {
     var currentCard = document.querySelector('.map__card');
     if (currentCard) {
-      currentCard.remove()
+      currentCard.remove();
     }
-    addCard(offer)
+    addCard(offer);
   });
 }
 
-function onClickRemove () {
-    map.classList.add('map--faded');
-    disableInputs();
-    addForm.classList.add('ad-form--disabled');
-    var drawCard = document.querySelector('.map__card');
-    drawCard.remove();
-    var drawPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-      for (var i = 0; i < drawPins.length; i++) {
-      var drawPin = drawPins[i];
-      drawPin.remove();
-}
+function onClickRemove() {
+  map.classList.add('map--faded');
+  disableInputs();
+  addForm.classList.add('ad-form--disabled');
+  var drawCard = document.querySelector('.map__card');
+  drawCard.remove();
+  var drawPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+  for (var i = 0; i < drawPins.length; i++) {
+    var drawPin = drawPins[i];
+    drawPin.remove();
+  }
 }
 
- function onChangeMinPrice (evt) {
+function onChangeMinPrice(evt) {
   switch (evt.target.value) {
     case 'flat':
       priceOfNight.setAttribute('min', '1000');
@@ -272,38 +273,6 @@ function onClickRemove () {
   }
 }
 
-var onChangeGuests = function (evt) {
-  switch (evt.target.value) {
-    case '3':
-      rooms[0].disabled = true;
-      rooms[1].disabled = true;
-      rooms[2].disabled = false;
-      rooms[3].disabled = true;
-      rooms[2].selected = true;
-      break;
-    case '2':
-      rooms[0].disabled = false;
-      rooms[1].disabled = false;
-      rooms[2].disabled = true;
-      rooms[3].disabled = true;
-      rooms[1].selected = true;
-      break;
-    case '1':
-      rooms[0].disabled = false;
-      rooms[1].disabled = true;
-      rooms[2].disabled = true;
-      rooms[3].disabled = true;
-      rooms[0].selected = true;
-      break;
-    case '0':
-      rooms[0].disabled = true;
-      rooms[1].disabled = true;
-      rooms[2].disabled = true;
-      rooms[3].disabled = false;
-      rooms[3].selected = true;
-      break;
-  }
-};
 
 var onChangeRooms = function (evt) {
   switch (evt.target.value) {
@@ -338,9 +307,17 @@ var onChangeRooms = function (evt) {
 };
 
 
+var synchronizedFields = function (field1, field2) {
+  field1.addEventListener('oninput', function () {
+    for (var i = 0; i < field1.options.length; i++) {
+      field1.value = field2.value
+    }
+  });
+};
+
 mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
 buttonRelode.addEventListener('click', onClickRemove);
 disableInputs();
 accommodationType.addEventListener('change', onChangeMinPrice);
 rooms.addEventListener('change', onChangeRooms);
-capacity.addEventListener('change', onChangeGuests);
+synchronizedFields(timein, timeout);
