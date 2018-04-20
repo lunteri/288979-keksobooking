@@ -307,10 +307,12 @@ var onChangeRooms = function (evt) {
 };
 
 
-var synchronizedFields = function (field1, field2) {
-  field1.addEventListener('oninput', function () {
+var onTermOfStayChange = function (field1, field2) {
+  field1.addEventListener('change', function () {
     for (var i = 0; i < field1.options.length; i++) {
-      field1.value = field2.value
+      if (field1.options[i].selected) {
+        field2.options[i].selected = true;
+      }
     }
   });
 };
@@ -320,4 +322,4 @@ buttonRelode.addEventListener('click', onClickRemove);
 disableInputs();
 accommodationType.addEventListener('change', onChangeMinPrice);
 rooms.addEventListener('change', onChangeRooms);
-synchronizedFields(timein, timeout);
+onTermOfStayChange(timein, timeout);
