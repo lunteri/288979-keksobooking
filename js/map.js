@@ -309,18 +309,10 @@ var onChangeRooms = function (evt) {
 
 var onTermOfStayChange = function (field1, field2) {
   field1.addEventListener('change', function () {
-    for (var i = 0; i < field1.options.length; i++) {
-      if (field1.options[i].selected) {
-        field2.options[i].selected = true;
-      }
-    }
+    field2.value = field1.value;
   });
   field2.addEventListener('change', function () {
-    for (var i = 0; i < field2.options.length; i++) {
-      if (field2.options[i].selected) {
-        field1.options[i].selected = true;
-      }
-    }
+    field1.value = field2.value;
   });
 };
 
