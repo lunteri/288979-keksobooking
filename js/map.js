@@ -110,7 +110,7 @@ function createPin(offer) {
 }
 
 
-function addPins(offers) {
+function addPins() {
   var buttonPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
   for (var i = 0; i < buttonPins.length; i ++) {
     var buttonPin = buttonPins[i];
@@ -190,9 +190,6 @@ function randomCallback() {
 
 var MAIN_PIN_WIDTH = 62;
 var MAIN_PIN_HEIGHT = 62;
-var MAIN_PIN_Y = 570;
-var MAIN_PIN_X = 375;
-var markerPin = (MAIN_PIN_X - MAIN_PIN_WIDTH / 2) + ', ' + (MAIN_PIN_Y - MAIN_PIN_HEIGHT / 2);
 var form = document.querySelector('.ad-form');
 var formInputs = form.querySelectorAll('fieldset');
 var mainPin = document.querySelector('.map__pin--main');
@@ -317,7 +314,7 @@ function onChangeRooms(evt) {
       capacity[3].selected = true;
       break;
   }
-};
+}
 
 
 function onTermOfStayChange(field1, field2) {
@@ -327,7 +324,7 @@ function onTermOfStayChange(field1, field2) {
   field2.addEventListener('change', function () {
     field1.value = field2.value;
   });
-};
+}
 
 
 mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
@@ -336,6 +333,14 @@ disableInputs();
 accommodationType.addEventListener('change', onChangeMinPrice);
 rooms.addEventListener('change', onChangeRooms);
 onTermOfStayChange(timein, timeout);
+
+var DRAG_LOCATION = {
+  xMin: 65,
+  xMax: 1200,
+  yMin: 150,
+  yMax: 700
+};
+
 pinHandle.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
 
@@ -346,36 +351,25 @@ pinHandle.addEventListener('mousedown', function (evt) {
 
   function onMouseMove(moveEvt) {
     moveEvt.preventDefault();
+
     var shift = {
       x: startCoords.x - moveEvt.clientX,
       y: startCoords.y - moveEvt.clientY
     };
-    startCoords = {
-      x: moveEvt.clientX,
-      y: moveEvt.clientY
-    };
-    addressInput.setAttribute('value', (startCoords.y) + ', ' + (startCoords.x));
-    if (pinHandle.offsetTop > map.clientHeight - PIN_HEIGHT) {
-      pinHandle.style.top = map.clientHeight - PIN_HEIGHT + 'px';
-    }
-    else if (pinHandle.offsetTop - shift.y < 0) {
-      pinHandle.style.top = 0;
-    }
-    else {
-      pinHandle.style.top = (pinHandle.offsetTop - shift.y) + 'px';
+
+    var newY = pinHandle.offsetTop - shift.y;
+    var newX = pinHandle.offsetLeft - shift.x;
+    if (newY >= DRAG_LOCATION.yMin - MAIN_PIN_HEIGHT && newY <= DRAG_LOCATION.yMax - MAIN_PIN_HEIGHT
+    && newX >= DRAG_LOCATION.xMin - MAIN_PIN_WIDTH && newX <= DRAG_LOCATION.xMax - MAIN_PIN_WIDTH) {
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
+      pinHandle.style.top = pinHandle.offsetTop - shift.y + 'px';
+      pinHandle.style.left = pinHandle.offsetLeft - shift.x + 'px';
+      addressInput.value = newY + ', ' + newX;
     }
 
-    if (pinHandle.offsetLeft > map.clientWidth - PIN_WIDTH) {
-      pinHandle.style.left = map.clientWidth - (PIN_WIDTH * 2) + 'px';
-    }
-
-    else if (pinHandle.offsetLeft - shift.x < 0) {
-      pinHandle.style.right = 0;
-    }
-
-    else {
-      pinHandle.style.left = (pinHandle.offsetLeft - shift.x) + 'px';
-    }
   }
 
   function onMouseUp(upEvt) {
