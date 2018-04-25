@@ -1,34 +1,112 @@
 'use strict';
+(function () {
 
-window.form = document.querySelector('.ad-form');
-window.formInputs = form.querySelectorAll('fieldset');
-window.addressInput = document.querySelector('#address');
-window.buttonRelode = document.querySelector('.ad-form__reset');
-window.addForm = document.querySelector('.ad-form');
-window.accommodationType = document.querySelector('select[name="type"]');
-window.priceOfNight = document.querySelector('#price');
-window.rooms = document.querySelector('select[name="rooms"]');
-window.capacity = document.querySelector('select[name="capacity"]');
-window.timein = document.querySelector('#timein');
-window.pinHandle = document.querySelector('.map__pin--main');
-window.timeout = document.querySelector('#timeout');
+  var map = document.querySelector('.map');
+  var offers = window.getOffers();
+  var mainPin = document.querySelector('.map__pin--main');
+  var MAIN_PIN_WIDTH = 62;
+  var MAIN_PIN_HEIGHT = 62;
+  var DRAG_LOCATION = {
+    xMin: 65,
+    xMax: 1200,
+    yMin: 150,
+    yMax: 700
+  };
 
-window.random = function getRandom(min, max) {
-  return Math.round((Math.random() * (max - min)) + min);
-};
+  function deletePins() {
+    var buttonPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    for (var i = 0; i < buttonPins.length; i++) {
+      var buttonPin = buttonPins[i];
+      if (buttonPin) {
+        buttonPin.remove();
+      }
+    }
+  }
 
-window.randomNumbers = function getRandomNumbers(arr, num) {
-  return arr[Math.floor(Math.random() * num)];
-};
+  function addPins() {
+    var containterOfPins = document.createDocumentFragment();
+    for (var i = 0; i < offers.length; i++) {
+      var pin = window.createPin(offers[i]);
+      setListenerToPin(pin, offers[i]);
+      containterOfPins.appendChild(pin);
+    }
+    map.appendChild(containterOfPins);
+  }
 
-window.randomCallback = function randomCallback() {
-  return Math.random() - 0.5;
-};
+  function onMainPinMouseMouseUp() {
+    map.classList.remove('map--faded');
+    addPins(offers);
+    window.form.enable();
+    mainPin.removeEventListener('click', onMainPinMouseMouseUp);
 
-mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
-window.buttonRelode.addEventListener('click', onClickRemove);
-window.disableInputs();
-window.accommodationType.addEventListener('change', onChangeMinPrice);
-window.rooms.addEventListener('change', onChangeRooms);
-window.onTermOfStayChange(timein, timeout);
+  }
+  function setListenerToPin(pin, offer) {
+    pin.addEventListener('click', function () {
+      var currentCard = document.querySelector('.map__card');
+      if (currentCard) {
+        currentCard.remove();
+      }
+      window.card.add(offer, map);
 
+
+    });
+  }
+
+
+
+  function onClickRemove() {
+    map.classList.add('map--faded');
+    window.form.disable();
+    window.form.setAddress(570, 375);
+    window.card.remove();
+    deletePins();
+    mainPin.style.left = 570 + 'px';
+    mainPin.style.top = 375 + 'px';
+  }
+
+
+  window.form.disable();
+  mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
+  window.form.setResetListener(onClickRemove);
+  mainPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    function onMouseMove(moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      var newY = mainPin.offsetTop - shift.y;
+      var newX = mainPin.offsetLeft - shift.x;
+      if (newY >= DRAG_LOCATION.yMin - MAIN_PIN_HEIGHT && newY <= DRAG_LOCATION.yMax - MAIN_PIN_HEIGHT
+        && newX >= DRAG_LOCATION.xMin - MAIN_PIN_WIDTH && newX <= DRAG_LOCATION.xMax - MAIN_PIN_WIDTH) {
+        startCoords = {
+          x: moveEvt.clientX,
+          y: moveEvt.clientY
+        };
+        mainPin.style.top = mainPin.offsetTop - shift.y + 'px';
+        mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
+        window.form.setAddress(newX, newY);
+      }
+
+    }
+
+    function onMouseUp(upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+})();
