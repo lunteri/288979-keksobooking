@@ -52,8 +52,6 @@
     });
   }
 
-
-
   function onClickRemove() {
     map.classList.add('map--faded');
     window.form.disable();
@@ -107,6 +105,15 @@
     }
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  });
+
+  var form = document.querySelector('.ad-form');
+  form.addEventListener('submit', function (evt) {
+
+    window.backendSend(new FormData(form), function (response) {
+      window.form.disable();
+    });
+    evt.preventDefault();
   });
 
 })();

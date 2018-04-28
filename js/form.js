@@ -12,8 +12,6 @@
   var timeout = document.querySelector('#timeout');
 
 
-
-
   function onChangeRooms(evt) {
     switch (evt.target.value) {
       case '1':
@@ -112,6 +110,7 @@
   function setResetListener(callback) {
     buttonReset.addEventListener('click', callback);
   }
+
 
   window.form = {
     setAddress: setAddress,
