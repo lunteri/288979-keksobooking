@@ -42,13 +42,8 @@
   }
   function setListenerToPin(pin, offer) {
     pin.addEventListener('click', function () {
-      var currentCard = document.querySelector('.map__card');
-      if (currentCard) {
-        currentCard.remove();
-      }
+      window.card.remove()
       window.card.add(offer, map);
-
-
     });
   }
 
