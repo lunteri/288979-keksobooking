@@ -62,38 +62,5 @@
   function randomCallback() {
     return Math.random() - 0.5;
   }
-  function getOffers() {
-    var offers = [];
-    for (var i = 0; i < 8; i++) {
-      offers.push({
-        'author': {
-          'avatar': 'img/avatars/user0' + images[i] + '.png'
-        },
 
-        'offer': {
-          'title': titles[i],
-          'address': getRandom(MIN_X, MAX_X) + getRandom(MIN_Y, MAX_Y),
-          'price': getRandom(MIN_PRICE, MAX_PRICE),
-          'type': getRandomNumbers(type, 4),
-          'rooms': getRandom(roomsRange.min, roomsRange.max),
-          'guests': getRandomNumbers(images, 8),
-          'checkin': getRandomNumbers(checks, 3),
-          'checkout': getRandomNumbers(checks, 3),
-          'features': getRandomArray(features),
-          'description': '',
-          'photos': photos.sort(randomCallback)
-        },
-
-        'location': {
-          'x': getRandom(MIN_X, MAX_X),
-          'y': getRandom(MIN_Y, MAX_Y)
-        }
-      });
-    }
-
-    return offers;
-  }
-
-
-  window.getOffers = getOffers;
 })();
