@@ -111,7 +111,7 @@
   }
   function setSumbitListener(callback) {
     form.addEventListener('submit', callback);
-}
+  }
 
   window.form = {
     setAddress: setAddress,

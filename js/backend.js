@@ -2,7 +2,7 @@
 
 (function () {
 
-  function send (data, onLoad, onError) {
+  function send(data, onLoad, onError) {
 
     var URL = 'https://js.dump.academy/keksobooking/';
     var xhr = new XMLHttpRequest();
@@ -29,7 +29,7 @@
     xhr.send(data);
   }
 
-  function load (onLoad, onError) {
+  function load(onLoad, onError) {
     var URL = 'https://js.dump.academy/keksobooking/data';
 
     var xhr = new XMLHttpRequest();
@@ -58,5 +58,5 @@
   window.backend = {
     send: send,
     load: load
-  }
+  };
 })();
