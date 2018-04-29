@@ -1,6 +1,6 @@
 'use strict';
 (function () {
-
+  var form = document.querySelector('.ad-form');
   var map = document.querySelector('.map');
   var offers = window.getOffers();
   var mainPin = document.querySelector('.map__pin--main');
@@ -42,17 +42,10 @@
   }
   function setListenerToPin(pin, offer) {
     pin.addEventListener('click', function () {
-      var currentCard = document.querySelector('.map__card');
-      if (currentCard) {
-        currentCard.remove();
-      }
+      window.card.remove()
       window.card.add(offer, map);
-
-
     });
   }
-
-
 
   function onClickRemove() {
     map.classList.add('map--faded');
@@ -107,6 +100,28 @@
     }
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  });
+
+  var onError = function (message) {
+    var errorBlock = document.createElement('div');
+    errorBlock.style.width = '100%';
+    errorBlock.style.height = '60px';
+    errorBlock.style.position = 'absolute';
+    errorBlock.style.background = '#fff';
+    errorBlock.style.color = '#000';
+    errorBlock.style.top = '0';
+    errorBlock.style.left = 0;
+    errorBlock.style.right = 0;
+    errorBlock.textContent = message;
+    document.body.insertAdjacentElement('afterbegin', errorBlock);
+  };
+
+
+  form.addEventListener('submit', function (evt) {
+    window.backendSend(new FormData(form), function (response) {
+      onClickRemove();
+    });
+    evt.preventDefault();
   });
 
 })();
