@@ -93,7 +93,7 @@
   }
 
   function setAddress(x, y) {
-    addressInput.value = x + ', ' + y;
+    addressInput.value = 'x: ' + x + ', ' + 'y: ' + y;
   }
 
   function disable() {
