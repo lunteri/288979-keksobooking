@@ -1,8 +1,7 @@
 'use strict';
 (function () {
-  var form = document.querySelector('.ad-form');
+
   var map = document.querySelector('.map');
-  var offers = window.getOffers();
   var mainPin = document.querySelector('.map__pin--main');
   var MAIN_PIN_WIDTH = 62;
   var MAIN_PIN_HEIGHT = 62;
@@ -23,7 +22,7 @@
     }
   }
 
-  function addPins() {
+  function addPins(offers) {
     var containterOfPins = document.createDocumentFragment();
     for (var i = 0; i < offers.length; i++) {
       var pin = window.createPin(offers[i]);
@@ -34,15 +33,28 @@
   }
 
   function onMainPinMouseMouseUp() {
-    map.classList.remove('map--faded');
-    addPins(offers);
-    window.form.enable();
-    mainPin.removeEventListener('click', onMainPinMouseMouseUp);
+    window.backend.load(function (data) {
+      map.classList.remove('map--faded');
+      addPins(data);
+      window.form.enable();
+    }, function onError(message) {
+      var errorBlock = document.createElement('div');
+      errorBlock.style.width = '100%';
+      errorBlock.style.height = '60px';
+      errorBlock.style.position = 'absolute';
+      errorBlock.style.background = '#fff';
+      errorBlock.style.color = '#000';
+      errorBlock.style.top = '0';
+      errorBlock.style.left = 0;
+      errorBlock.style.right = 0;
+      errorBlock.textContent = message;
+      document.body.insertAdjacentElement('afterbegin', errorBlock);
+    });
 
   }
   function setListenerToPin(pin, offer) {
     pin.addEventListener('click', function () {
-      window.card.remove()
+      window.card.remove();
       window.card.add(offer, map);
     });
   }
@@ -101,27 +113,14 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
-
-  var onError = function (message) {
-    var errorBlock = document.createElement('div');
-    errorBlock.style.width = '100%';
-    errorBlock.style.height = '60px';
-    errorBlock.style.position = 'absolute';
-    errorBlock.style.background = '#fff';
-    errorBlock.style.color = '#000';
-    errorBlock.style.top = '0';
-    errorBlock.style.left = 0;
-    errorBlock.style.right = 0;
-    errorBlock.textContent = message;
-    document.body.insertAdjacentElement('afterbegin', errorBlock);
-  };
-
-
-  form.addEventListener('submit', function (evt) {
-    window.backendSend(new FormData(form), function (response) {
+  function onSuccessSumbit(evt) {
+    window.backend.send(new FormData(evt.target), function (response) {
       onClickRemove();
     });
     evt.preventDefault();
-  });
+  }
+
+  window.form.setSumbitListener(onSuccessSumbit);
+
 
 })();

@@ -10,7 +10,7 @@
   var capacity = document.querySelector('select[name="capacity"]');
   var timein = document.querySelector('#timein');
   var timeout = document.querySelector('#timeout');
-  
+
   function onChangeRooms(evt) {
     switch (evt.target.value) {
       case '1':
@@ -109,10 +109,15 @@
   function setResetListener(callback) {
     buttonReset.addEventListener('click', callback);
   }
+  function setSumbitListener(callback) {
+    form.addEventListener('submit', callback);
+  }
+
   window.form = {
     setAddress: setAddress,
     enable: enable,
     disable: disable,
-    setResetListener: setResetListener
+    setResetListener: setResetListener,
+    setSumbitListener: setSumbitListener
   };
 })();
