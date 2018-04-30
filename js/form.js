@@ -8,8 +8,8 @@
   var priceOfNight = document.querySelector('#price');
   var rooms = document.querySelector('select[name="rooms"]');
   var capacity = document.querySelector('select[name="capacity"]');
-  var timein = document.querySelector('#timein');
-  var timeout = document.querySelector('#timeout');
+  var timeInSelect = document.querySelector('#timein');
+  var timeOutSelect = document.querySelector('#timeout');
 
   function onChangeRooms(evt) {
     switch (evt.target.value) {
@@ -67,7 +67,7 @@
     });
   }
 
-  onTermOfStayChange(timein, timeout);
+  onTermOfStayChange(timeInSelect, timeOutSelect);
   accommodationType.addEventListener('change', onChangeMinPrice);
   rooms.addEventListener('change', onChangeRooms);
   function onChangeMinPrice(evt) {

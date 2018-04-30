@@ -1,8 +1,6 @@
 'use strict';
 (function () {
 
-  var map = document.querySelector('.map');
-  var mainPin = document.querySelector('.map__pin--main');
   var MAIN_PIN_WIDTH = 62;
   var MAIN_PIN_HEIGHT = 62;
   var DRAG_LOCATION = {
@@ -11,6 +9,9 @@
     yMin: 150,
     yMax: 700
   };
+  var successBlock = document.querySelector('.success');
+  var map = document.querySelector('.map');
+  var mainPin = document.querySelector('.map__pin--main');
 
   function deletePins() {
     var buttonPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -37,20 +38,32 @@
       map.classList.remove('map--faded');
       addPins(data);
       window.form.enable();
+      mainPin.removeEventListener('mouseup', onMainPinMouseMouseUp);
+      mainPin.addEventListener('mouseup', function () {
+        map.classList.remove('map--faded');
+        addPins(data);
+        window.form.enable();
+      });
     }, function onError(message) {
       var errorBlock = document.createElement('div');
-      errorBlock.style.width = '100%';
-      errorBlock.style.height = '60px';
+      errorBlock.style.width = '89%';
+      errorBlock.style.height = '28px';
       errorBlock.style.position = 'absolute';
       errorBlock.style.background = '#fff';
       errorBlock.style.color = '#000';
       errorBlock.style.top = '0';
-      errorBlock.style.left = 0;
-      errorBlock.style.right = 0;
+      errorBlock.style.left = '0';
+      errorBlock.style.right = '0';
+      errorBlock.style.textAlign = 'center';
+      errorBlock.style.margin = '0 auto';
+      errorBlock.style.zIndex = '20';
+      errorBlock.style.fontSize = '18px';
+      errorBlock.style.border = '2px solid #f00';
+      errorBlock.style.paddingTop = '2px'
       errorBlock.textContent = message;
       document.body.insertAdjacentElement('afterbegin', errorBlock);
-    });
 
+    });
   }
   function setListenerToPin(pin, offer) {
     pin.addEventListener('click', function () {
@@ -70,9 +83,7 @@
   }
 
 
-  window.form.disable();
-  mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
-  window.form.setResetListener(onClickRemove);
+
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
@@ -116,11 +127,38 @@
   function onSuccessSumbit(evt) {
     window.backend.send(new FormData(evt.target), function (response) {
       onClickRemove();
+      successBlock.classList.remove('hidden');
+      successBlock.addEventListener('click', function () {
+        successBlock.classList.add('hidden');
+      });
+
+    }, function onError(message) {
+      var errorBlock = document.createElement('div');
+      errorBlock.style.width = '89%';
+      errorBlock.style.height = '28px';
+      errorBlock.style.position = 'absolute';
+      errorBlock.style.background = '#fff';
+      errorBlock.style.color = '#000';
+      errorBlock.style.top = '0';
+      errorBlock.style.left = '0';
+      errorBlock.style.right = '0';
+      errorBlock.style.textAlign = 'center';
+      errorBlock.style.margin = '0 auto';
+      errorBlock.style.zIndex = '20';
+      errorBlock.style.fontSize = '18px';
+      errorBlock.style.border = '2px solid #f00';
+      errorBlock.style.paddingTop = '2px';
+      errorBlock.textContent = message;
+      document.body.insertAdjacentElement('afterbegin', errorBlock);
     });
     evt.preventDefault();
   }
 
-  window.form.setSumbitListener(onSuccessSumbit);
 
+  window.form.disable();
+  mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
+  window.form.setResetListener(onClickRemove);
+  window.form.setSumbitListener(onSuccessSumbit);
+  window.form.setAddress(570, 375);
 
 })();
