@@ -1,6 +1,7 @@
 'use strict';
 (function () {
-
+  var ADDRESS_X = 570;
+  var ADDRESS_Y = 375;
   var MAIN_PIN_WIDTH = 62;
   var MAIN_PIN_HEIGHT = 62;
   var DRAG_LOCATION = {
@@ -12,6 +13,7 @@
   var successBlock = document.querySelector('.success');
   var map = document.querySelector('.map');
   var mainPin = document.querySelector('.map__pin--main');
+  var filterForm = document.querySelector('.map__filters');
 
   function deletePins() {
     var buttonPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -21,6 +23,27 @@
         buttonPin.remove();
       }
     }
+  }
+
+  function onError(message) {
+    var errorBlock = document.createElement('div');
+    errorBlock.style.width = '89%';
+    errorBlock.style.height = '28px';
+    errorBlock.style.position = 'absolute';
+    errorBlock.style.background = '#fff';
+    errorBlock.style.color = '#000';
+    errorBlock.style.top = '0';
+    errorBlock.style.left = '0';
+    errorBlock.style.right = '0';
+    errorBlock.style.textAlign = 'center';
+    errorBlock.style.margin = '0 auto';
+    errorBlock.style.zIndex = '20';
+    errorBlock.style.fontSize = '18px';
+    errorBlock.style.border = '2px solid #f00';
+    errorBlock.style.paddingTop = '2px';
+    errorBlock.textContent = message;
+    document.body.insertAdjacentElement('afterbegin', errorBlock);
+
   }
 
   function addPins(offers) {
@@ -35,36 +58,21 @@
 
   function onMainPinMouseMouseUp() {
     window.backend.load(function (data) {
+      window.pins = data;
       map.classList.remove('map--faded');
-      addPins(data);
+      var result = filterValue(window.pins);
+      addPins(result);
       window.form.enable();
       mainPin.removeEventListener('mouseup', onMainPinMouseMouseUp);
       mainPin.addEventListener('mouseup', function () {
         map.classList.remove('map--faded');
-        addPins(data);
+        var resultSecond = filterValue(window.pins);
+        addPins(resultSecond);
         window.form.enable();
       });
-    }, function onError(message) {
-      var errorBlock = document.createElement('div');
-      errorBlock.style.width = '89%';
-      errorBlock.style.height = '28px';
-      errorBlock.style.position = 'absolute';
-      errorBlock.style.background = '#fff';
-      errorBlock.style.color = '#000';
-      errorBlock.style.top = '0';
-      errorBlock.style.left = '0';
-      errorBlock.style.right = '0';
-      errorBlock.style.textAlign = 'center';
-      errorBlock.style.margin = '0 auto';
-      errorBlock.style.zIndex = '20';
-      errorBlock.style.fontSize = '18px';
-      errorBlock.style.border = '2px solid #f00';
-      errorBlock.style.paddingTop = '2px'
-      errorBlock.textContent = message;
-      document.body.insertAdjacentElement('afterbegin', errorBlock);
-
-    });
+    }, onError());
   }
+
   function setListenerToPin(pin, offer) {
     pin.addEventListener('click', function () {
       window.card.remove();
@@ -75,14 +83,12 @@
   function onClickRemove() {
     map.classList.add('map--faded');
     window.form.disable();
-    window.form.setAddress(570, 375);
+    window.form.setAddress(ADDRESS_X, ADDRESS_Y);
     window.card.remove();
     deletePins();
-    mainPin.style.left = 570 + 'px';
-    mainPin.style.top = 375 + 'px';
+    mainPin.style.left = ADDRESS_X + 'px';
+    mainPin.style.top = ADDRESS_Y + 'px';
   }
-
-
 
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -121,44 +127,63 @@
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     }
+
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+
   function onSuccessSumbit(evt) {
-    window.backend.send(new FormData(evt.target), function (response) {
+    window.backend.send(new FormData(evt.target), function () {
       onClickRemove();
       successBlock.classList.remove('hidden');
       successBlock.addEventListener('click', function () {
         successBlock.classList.add('hidden');
       });
 
-    }, function onError(message) {
-      var errorBlock = document.createElement('div');
-      errorBlock.style.width = '89%';
-      errorBlock.style.height = '28px';
-      errorBlock.style.position = 'absolute';
-      errorBlock.style.background = '#fff';
-      errorBlock.style.color = '#000';
-      errorBlock.style.top = '0';
-      errorBlock.style.left = '0';
-      errorBlock.style.right = '0';
-      errorBlock.style.textAlign = 'center';
-      errorBlock.style.margin = '0 auto';
-      errorBlock.style.zIndex = '20';
-      errorBlock.style.fontSize = '18px';
-      errorBlock.style.border = '2px solid #f00';
-      errorBlock.style.paddingTop = '2px';
-      errorBlock.textContent = message;
-      document.body.insertAdjacentElement('afterbegin', errorBlock);
-    });
+    }, onError());
     evt.preventDefault();
   }
 
 
   window.form.disable();
   mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
+  var valueOfSelect = {
+    housingType: document.querySelector('#housing-type'),
+    housingPrice: document.querySelector('#housing-price'),
+    housingRooms: document.querySelector('#housing-rooms'),
+    housingGuests: document.querySelector('#housing-guests'),
+    housingFeatures: document.querySelector('#housing-features')
+  };
+  filterForm.addEventListener('change', function () {
+    var result = filterValue(window.pins);
+    deletePins();
+    addPins(result);
+  });
+
+  function filterValue(array) {
+    var newArray = array.filter(function (it) {
+
+      if (valueOfSelect.housingType.value != it.offer.type && valueOfSelect.housingType.value != 'any') {
+        return false;
+      }
+      if (valueOfSelect.housingPrice.value != it.offer.price && valueOfSelect.housingPrice.value != 'any') {
+      return false
+      }
+
+      if (valueOfSelect.housingRooms.value != it.offer.rooms && valueOfSelect.housingRooms.value != 'any') {
+        return false
+      }
+
+      if (valueOfSelect.housingGuests.value != it.offer.guests && valueOfSelect.housingGuests.value != 'any') {
+        return false
+      }
+      return true;
+    };
+    return newArray;
+  }
+
   window.form.setResetListener(onClickRemove);
   window.form.setSumbitListener(onSuccessSumbit);
-  window.form.setAddress(570, 375);
+  window.form.setAddress(ADDRESS_X, ADDRESS_Y);
 
 })();
