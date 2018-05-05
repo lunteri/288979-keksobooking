@@ -13,7 +13,7 @@
   var successBlock = document.querySelector('.success');
   var map = document.querySelector('.map');
   var mainPin = document.querySelector('.map__pin--main');
-  var filterForm = document.querySelector('.map__filters');
+
 
   function deletePins() {
     var buttonPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -58,19 +58,16 @@
 
   function onMainPinMouseMouseUp() {
     window.backend.load(function (data) {
-      window.pins = data;
       map.classList.remove('map--faded');
-      var result = filterValue(window.pins);
-      addPins(result);
+      addPins(data.slice(0, 5));
       window.form.enable();
-      mainPin.removeEventListener('mouseup', onMainPinMouseMouseUp);
-      mainPin.addEventListener('mouseup', function () {
-        map.classList.remove('map--faded');
-        var resultSecond = filterValue(window.pins);
-        addPins(resultSecond);
-        window.form.enable();
+      window.filter.setup(data, function (ads) {
+        window.card.remove();
+        deletePins();
+        window.debounce(addPins(ads));
       });
-    }, onError());
+      mainPin.removeEventListener('mouseup', onMainPinMouseMouseUp);
+    }, onError);
   }
 
   function setListenerToPin(pin, offer) {
@@ -88,6 +85,7 @@
     deletePins();
     mainPin.style.left = ADDRESS_X + 'px';
     mainPin.style.top = ADDRESS_Y + 'px';
+    mainPin.addEventListener('click', onMainPinMouseMouseUp);
   }
 
   mainPin.addEventListener('mousedown', function (evt) {
@@ -140,47 +138,13 @@
         successBlock.classList.add('hidden');
       });
 
-    }, onError());
+    }, onError);
     evt.preventDefault();
   }
 
 
   window.form.disable();
   mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
-  var valueOfSelect = {
-    housingType: document.querySelector('#housing-type'),
-    housingPrice: document.querySelector('#housing-price'),
-    housingRooms: document.querySelector('#housing-rooms'),
-    housingGuests: document.querySelector('#housing-guests'),
-    housingFeatures: document.querySelector('#housing-features')
-  };
-  filterForm.addEventListener('change', function () {
-    var result = filterValue(window.pins);
-    deletePins();
-    addPins(result);
-  });
-
-  function filterValue(array) {
-    var newArray = array.filter(function (it) {
-
-      if (valueOfSelect.housingType.value != it.offer.type && valueOfSelect.housingType.value != 'any') {
-        return false;
-      }
-      if (valueOfSelect.housingPrice.value != it.offer.price && valueOfSelect.housingPrice.value != 'any') {
-      return false
-      }
-
-      if (valueOfSelect.housingRooms.value != it.offer.rooms && valueOfSelect.housingRooms.value != 'any') {
-        return false
-      }
-
-      if (valueOfSelect.housingGuests.value != it.offer.guests && valueOfSelect.housingGuests.value != 'any') {
-        return false
-      }
-      return true;
-    };
-    return newArray;
-  }
 
   window.form.setResetListener(onClickRemove);
   window.form.setSumbitListener(onSuccessSumbit);
