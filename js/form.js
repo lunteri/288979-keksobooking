@@ -1,6 +1,13 @@
 'use strict';
 (function () {
+  var ConformityGuests = {
+    1: ['1'],
+    2: ['1', '2'],
+    3: ['1', '2', '3'],
+    100: ['0']
+  };
   var form = document.querySelector('.ad-form');
+  var filterForm = document.querySelector('.map__filters');
   var addressInput = document.querySelector('#address');
   var buttonReset = document.querySelector('.ad-form__reset');
   var formInputs = form.querySelectorAll('fieldset');
@@ -11,37 +18,19 @@
   var timeInSelect = document.querySelector('#timein');
   var timeOutSelect = document.querySelector('#timeout');
 
-  function onChangeRooms(evt) {
-    switch (evt.target.value) {
-      case '1':
-        capacity[0].disabled = true;
-        capacity[1].disabled = true;
-        capacity[2].disabled = false;
-        capacity[2].selected = true;
-        capacity[3].disabled = true;
-        break;
-      case '2':
-        capacity[0].disabled = true;
-        capacity[1].disabled = false;
-        capacity[2].selected = true;
-        capacity[2].disabled = false;
-        capacity[3].disabled = true;
-        break;
-      case '3':
-        capacity[0].disabled = false;
-        capacity[1].disabled = false;
-        capacity[2].disabled = false;
-        capacity[3].disabled = true;
-        break;
-      case '100':
-        capacity[0].disabled = true;
-        capacity[1].disabled = true;
-        capacity[2].disabled = true;
-        capacity[3].disabled = false;
-        capacity[3].selected = true;
-        break;
-    }
+  function onRoomsChange(evt) {
+    var numberOfRooms = evt.target.value;
+    var availableNumberOfGuests = ConformityGuests[numberOfRooms];
+    Array.from(capacity.options).forEach(function (option) {
+      if (availableNumberOfGuests.includes(option.value)) {
+        option.selected = true;
+        option.hidden = false;
+      } else {
+        option.hidden = true;
+      }
+    });
   }
+
 
   function disableInputs() {
     for (var i = 0; i < formInputs.length; i++) {
@@ -57,7 +46,6 @@
     }
   }
 
-
   function onTermOfStayChange(field1, field2) {
     field1.addEventListener('change', function () {
       field2.value = field1.value;
@@ -68,9 +56,9 @@
   }
 
   onTermOfStayChange(timeInSelect, timeOutSelect);
-  accommodationType.addEventListener('change', onChangeMinPrice);
-  rooms.addEventListener('change', onChangeRooms);
-  function onChangeMinPrice(evt) {
+  accommodationType.addEventListener('change', onMinPriceChange);
+  rooms.addEventListener('change', onRoomsChange);
+  function onMinPriceChange(evt) {
     switch (evt.target.value) {
       case 'flat':
         priceOfNight.setAttribute('min', '1000');
@@ -98,6 +86,7 @@
   function disable() {
     form.classList.add('ad-form--disabled');
     form.reset();
+    filterForm.reset();
     disableInputs();
   }
 
@@ -106,18 +95,28 @@
     enableInputs();
   }
 
-  function setResetListener(callback) {
-    buttonReset.addEventListener('click', callback);
+  function setResetCallback(callback) {
+    buttonReset.addEventListener('click', function () {
+      callback();
+    });
   }
-  function setSumbitListener(callback) {
-    form.addEventListener('submit', callback);
+  function setSubmitCallback(callback) {
+    form.addEventListener('submit', function (evt) {
+      window.backend.send(new FormData(evt.target), function () {
+        callback();
+        window.message.showSuccess();
+      }, function (message) {
+        window.message.showError(message);
+      });
+      evt.preventDefault();
+    });
   }
 
   window.form = {
     setAddress: setAddress,
     enable: enable,
     disable: disable,
-    setResetListener: setResetListener,
-    setSumbitListener: setSumbitListener
+    setResetCallback: setResetCallback,
+    setSubmitCallback: setSubmitCallback
   };
 })();

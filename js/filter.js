@@ -16,14 +16,16 @@
   };
   var MAX_NUMBER_OF_PINS = 5;
   var filterForm = document.querySelector('.map__filters');
-  var filterSelects = filterForm.querySelectorAll('select');
-  var filterCheckboxes = filterForm.querySelectorAll('input');
+  var filterSelects = Array.from(filterForm.querySelectorAll('select'));
+  var filterCheckboxes = Array.from(filterForm.querySelectorAll('input'));
   var ads = null;
-  var func = null;
+  var reRenderPins = null;
 
-  function onChange() {
-    var filteredAds = getFilteredAds();
-    func(filteredAds);
+  function onFilterChange() {
+    window.debounce(function () {
+      var filteredAds = getFilteredAds();
+      reRenderPins(filteredAds);
+    });
   }
 
   function getFilteredAds() {
@@ -75,16 +77,16 @@
   }
 
   filterSelects.forEach(function (filterSelect) {
-    filterSelect.addEventListener('change', onChange);
+    filterSelect.addEventListener('change', onFilterChange);
   });
 
   filterCheckboxes.forEach(function (filterCheckbox) {
-    filterCheckbox.addEventListener('change', onChange);
+    filterCheckbox.addEventListener('change', onFilterChange);
   });
 
   function setup(data, callback) {
     ads = data;
-    func = callback;
+    reRenderPins = callback;
   }
 
   window.filter = {

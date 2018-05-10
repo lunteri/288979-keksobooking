@@ -2,18 +2,17 @@
 (function () {
   var ADDRESS_X = 570;
   var ADDRESS_Y = 375;
+  var ACTIVE_PIN_HEIGHT = 80;
   var MAIN_PIN_WIDTH = 62;
   var MAIN_PIN_HEIGHT = 62;
   var DRAG_LOCATION = {
     xMin: 65,
     xMax: 1200,
-    yMin: 150,
-    yMax: 700
+    yMin: 132,
+    yMax: 482
   };
-  var successBlock = document.querySelector('.success');
   var map = document.querySelector('.map');
   var mainPin = document.querySelector('.map__pin--main');
-
 
   function deletePins() {
     var buttonPins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -25,35 +24,14 @@
     }
   }
 
-  function onError(message) {
-    var errorBlock = document.createElement('div');
-    errorBlock.style.width = '89%';
-    errorBlock.style.height = '28px';
-    errorBlock.style.position = 'absolute';
-    errorBlock.style.background = '#fff';
-    errorBlock.style.color = '#000';
-    errorBlock.style.top = '0';
-    errorBlock.style.left = '0';
-    errorBlock.style.right = '0';
-    errorBlock.style.textAlign = 'center';
-    errorBlock.style.margin = '0 auto';
-    errorBlock.style.zIndex = '20';
-    errorBlock.style.fontSize = '18px';
-    errorBlock.style.border = '2px solid #f00';
-    errorBlock.style.paddingTop = '2px';
-    errorBlock.textContent = message;
-    document.body.insertAdjacentElement('afterbegin', errorBlock);
-
-  }
-
   function addPins(offers) {
-    var containterOfPins = document.createDocumentFragment();
+    var containerOfPins = document.createDocumentFragment();
     for (var i = 0; i < offers.length; i++) {
       var pin = window.createPin(offers[i]);
       setListenerToPin(pin, offers[i]);
-      containterOfPins.appendChild(pin);
+      containerOfPins.appendChild(pin);
     }
-    map.appendChild(containterOfPins);
+    map.appendChild(containerOfPins);
   }
 
   function onMainPinMouseMouseUp() {
@@ -64,10 +42,12 @@
       window.filter.setup(data, function (ads) {
         window.card.remove();
         deletePins();
-        window.debounce(addPins(ads));
+        addPins(ads);
       });
       mainPin.removeEventListener('mouseup', onMainPinMouseMouseUp);
-    }, onError);
+    }, function (message) {
+      window.message.showError(message);
+    });
   }
 
   function setListenerToPin(pin, offer) {
@@ -77,7 +57,7 @@
     });
   }
 
-  function onClickRemove() {
+  function resetPage() {
     map.classList.add('map--faded');
     window.form.disable();
     window.form.setAddress(ADDRESS_X, ADDRESS_Y);
@@ -95,6 +75,7 @@
       x: evt.clientX,
       y: evt.clientY
     };
+
 
     function onMouseMove(moveEvt) {
       moveEvt.preventDefault();
@@ -114,7 +95,7 @@
         };
         mainPin.style.top = mainPin.offsetTop - shift.y + 'px';
         mainPin.style.left = mainPin.offsetLeft - shift.x + 'px';
-        window.form.setAddress(newX, newY);
+        window.form.setAddress(newX + MAIN_PIN_WIDTH / 2, newY + ACTIVE_PIN_HEIGHT);
       }
 
     }
@@ -130,24 +111,11 @@
     document.addEventListener('mouseup', onMouseUp);
   });
 
-  function onSuccessSumbit(evt) {
-    window.backend.send(new FormData(evt.target), function () {
-      onClickRemove();
-      successBlock.classList.remove('hidden');
-      successBlock.addEventListener('click', function () {
-        successBlock.classList.add('hidden');
-      });
-
-    }, onError);
-    evt.preventDefault();
-  }
-
-
   window.form.disable();
   mainPin.addEventListener('mouseup', onMainPinMouseMouseUp);
 
-  window.form.setResetListener(onClickRemove);
-  window.form.setSumbitListener(onSuccessSumbit);
+  window.form.setResetCallback(resetPage);
+  window.form.setSubmitCallback(resetPage);
   window.form.setAddress(ADDRESS_X, ADDRESS_Y);
 
 })();

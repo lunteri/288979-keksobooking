@@ -9,7 +9,5 @@
     }
     lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
   }
-  window.debounce = {
-    debounce: debounce
-  };
+  window.debounce = debounce;
 })();
