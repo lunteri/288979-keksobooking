@@ -25,7 +25,7 @@
     window.setTimeout(function () {
       errorBlock.remove();
     }, TIMEOUT_SECONDS);
-  };
+  }
 
   function showSuccess() {
     successBlock.classList.remove('hidden');
@@ -37,5 +37,5 @@
   window.message = {
     showError: showError,
     showSuccess: showSuccess
-  }
-})()
+  };
+})();
