@@ -21,8 +21,8 @@
       featureElement.classList.add('popup__feature');
       featureElement.classList.add('popup__feature--' + featureElementAdd);
       featureFragment.appendChild(featureElement);
-      featuresContainer.appendChild(featureFragment);
     }
+      featuresContainer.appendChild(featureFragment);
   }
 
   function renderPhotosContainer(photos) {
@@ -37,8 +37,8 @@
       photosBlockImg.alt = 'Фотография жилья';
       photosBlockImg.classList.add('popup__photo');
       photosFragment.appendChild(photosBlockImg);
-      photosBlock.appendChild(photosFragment);
     }
+      photosBlock.appendChild(photosFragment);
   }
   function createCard(ad) {
     newCard.querySelector('.popup__title').textContent = ad.offer.title;
@@ -60,15 +60,15 @@
     var closeBtn = currentCard.querySelector('.popup__close');
     closeBtn.addEventListener('click', function () {
       currentCard.remove();
-      document.removeEventListener('keydown', onBlockClose);
+      document.removeEventListener('keydown', onCardClose);
     });
-    document.addEventListener('keydown', onBlockClose);
+    document.addEventListener('keydown', onCardClose);
   }
 
-  function onBlockClose(evt) {
+  function onCardClose(evt) {
     if (evt.keyCode === ESC_CODE) {
       currentCard.remove();
-      document.removeEventListener('keydown', onBlockClose);
+      document.removeEventListener('keydown', onCardClose);
     }
   }
 

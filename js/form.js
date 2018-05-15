@@ -17,10 +17,15 @@
   var capacity = document.querySelector('select[name="capacity"]');
   var timeInSelect = document.querySelector('#timein');
   var timeOutSelect = document.querySelector('#timeout');
-
+  var roomsInput = document.querySelector('#room_number');
+  setGuestNumber(roomsInput.value);
+  
   function onRoomsChange(evt) {
-    var numberOfRooms = evt.target.value;
-    var availableNumberOfGuests = ConformityGuests[numberOfRooms];
+      var numberOfRooms = evt.target.value;
+      setGuestNumber(numberOfRooms);
+  }
+  function setGuestNumber(roomsNumber) {
+    var availableNumberOfGuests = ConformityGuests[roomsNumber];
     Array.from(capacity.options).forEach(function (option) {
       if (availableNumberOfGuests.includes(option.value)) {
         option.selected = true;
