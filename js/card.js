@@ -22,7 +22,7 @@
       featureElement.classList.add('popup__feature--' + featureElementAdd);
       featureFragment.appendChild(featureElement);
     }
-      featuresContainer.appendChild(featureFragment);
+    featuresContainer.appendChild(featureFragment);
   }
 
   function renderPhotosContainer(photos) {
@@ -38,7 +38,7 @@
       photosBlockImg.classList.add('popup__photo');
       photosFragment.appendChild(photosBlockImg);
     }
-      photosBlock.appendChild(photosFragment);
+    photosBlock.appendChild(photosFragment);
   }
   function createCard(ad) {
     newCard.querySelector('.popup__title').textContent = ad.offer.title;
